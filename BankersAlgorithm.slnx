@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="BankersAlgorithm/BankersAlgorithm.vcxproj" />
+  <Project Path="BankersAlgorithm/BankersAlgorithm.vcxproj" Id="b92e59ae-5647-4d40-b6d6-141e680e5fee" />
 </Solution>
