@@ -1,8 +1,14 @@
 #include "state.h"
 
-state::state(int test)
+state::state()
 {
-	FtxuiIO ui;
+	head = new node();
+	pcount = 0;
+	rcount = 0;
+}
+
+state::state(int p, int r, int test)
+{
 
 	head = new node();
 
@@ -34,82 +40,6 @@ state::state(int test)
 		sim();
 
 	}
-	else
-	{
-
-		string prompt = "Number of available resources: ";
-		rcount = ui.PromptInt(prompt);
-
-		prompt = "Please enter a process count: ";
-		pcount = ui.PromptInt(prompt);
-	}
-}
-
-void state::state_bak(int rcount, int pcount)
-{
-	// input resource vector
-	for (int i = 0; i < rcount; i++)
-	{
-		string prompt = "Please enter a resource count for resource " + to_string(i + 1);
-
-		int temp = InputHandler::GetInt(&prompt);
-
-		resource.push_back(temp);
-	}
-
-	// input resource vector
-	for (int i = 0; i < pcount; i++)
-	{
-		claim.push_back({});
-		for (int j = 0; j < rcount; j++)
-		{
-			string prompt = "Please enter the resource claim for process " + to_string(i + 1) + " and resource " + to_string(j + 1);
-
-			int temp = InputHandler::GetInt(&prompt);
-
-			// check that claim is not greater than max resource allocation
-			if (temp > resource[j])
-			{
-				cout << "Process " << i + 1 << " with claim of " << temp << " exceeds value for resource " << j + 1 << " with only " << resource[j] << " resource's to allocate." << endl;
-
-				// exit program
-				return;
-			}
-
-			claim[i].push_back(temp);
-		}
-
-	}
-
-	// input current allocation state
-	for (int i = 0; i < pcount; i++)
-	{
-		alloc.push_back({});
-		for (int j = 0; j < rcount; j++)
-		{
-			string prompt = "Please enter the resource allocation for process " + to_string(i + 1) + " and resource " + to_string(j + 1);
-
-			int temp = InputHandler::GetInt(&prompt);
-
-			// check that allocation is not greater than the claim
-			if (temp > claim[i][j])
-			{
-				cout << "Process " << i + 1 << " with claim of " << temp << " exceeds value for resource " << j + 1 << " with only " << claim[i][j] << " resource's to allocate." << endl;
-
-				// exit program 
-				return;
-			}
-
-			claim[i].push_back(temp);
-		}
-
-	}
-
-	// calculate available vector
-	calc_avail();
-
-	// simulate process execution and resource alloc
-	sim();
 
 }
 
@@ -192,7 +122,7 @@ bool state::p_done(node* curr, int p)
 void state::sim()
 {
 	node* curr = head;
-	vector<int> path{};
+	path = {};
 
 	// if we traverse all n processes, we are safe
 	while (path.size() != pcount && curr != nullptr)
@@ -226,6 +156,7 @@ void state::sim()
 				curr->explored[path.back()] = true;
 				temp->parent = curr;
 				curr = temp;
+				curr->process = path.back();
 				calc_need(curr);
 			}
 		}
@@ -249,4 +180,77 @@ void state::sim()
 state::~state()
 {
 	delete head;
+}
+
+
+// for UI
+void state::set_dimensions(int resources, int processes)
+{
+	rcount = resources;
+	pcount = processes;
+
+	resource.assign(rcount, 0);
+	avail.assign(rcount, 0);
+	claim.assign(pcount, vector<int>(rcount, 0));
+	alloc.assign(pcount, vector<int>(rcount, 0));
+}
+
+void state::set_resource(const vector<int>& r)
+{
+	resource = r;
+}
+
+void state::set_claim(const vector<vector<int>>& c)
+{
+	claim = c;
+}
+
+void state::set_alloc(const vector<vector<int>>& a)
+{
+	alloc = a;
+}
+
+const vector<int>& state::get_resource() const { return resource; }
+const vector<int>& state::get_avail() const { return avail; }
+const vector<vector<int>>& state::get_claim() const { return claim; }
+const vector<vector<int>>& state::get_alloc() const { return alloc; }
+const std::vector<int>& state::get_path() const { return path; }
+
+bool state::validate_alloc_le_claim(vector<pair<int, int>>& bad_cells) const
+{
+	bad_cells.clear();
+
+	for (int i = 0; i < pcount; ++i)
+	{
+		for (int j = 0; j < rcount; ++j)
+		{
+			if (alloc[i][j] > claim[i][j])
+			{
+				bad_cells.push_back({ i, j });
+			}
+		}
+	}
+
+	return bad_cells.empty();
+}
+
+
+int state::get_rcount() const {
+	return rcount;
+}
+
+int state::get_pcount() const {
+	return pcount;
+}
+
+void state::prepare_for_simulation()
+{
+	delete head;
+	head = new node();
+
+	avail.clear();
+	path.clear();
+
+	calc_avail();
+	calc_need(head);
 }

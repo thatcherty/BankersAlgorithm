@@ -16,8 +16,7 @@ add_executable(BankersAlgorithm
   Source.cpp
   state.cpp
   InputHandler.cpp
-  FtxuiIO.cpp
-  "node.h" "node.cpp")
+  "node.h" "node.cpp" "BankersFTXApp.h")
 
 
 target_link_libraries(BankersAlgorithm PRIVATE

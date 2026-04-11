@@ -4,6 +4,7 @@ node::node()
 {
 	branches = { nullptr };
 	parent = nullptr;
+	process = -1;
 }
 
 node::~node()

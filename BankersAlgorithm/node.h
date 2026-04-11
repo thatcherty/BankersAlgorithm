@@ -13,5 +13,6 @@ public:
 	vector<vector<int>> need;
 	vector<vector<int>> curr_claim;
 	vector<bool> explored;
+	int process;
 	~node();
 };
