@@ -825,7 +825,11 @@ private:
                     std::to_string(static_cast<int>(snapshots_.size()) - 1);
 
                 std::string process_text;
-                if (current_step_ < static_cast<int>(execution_path_.size())) {
+                if (static_cast<int>(execution_path_.size()) == 0)
+                {
+                    process_text = "Deadlock, no processes can complete.";
+                }
+                else if (current_step_ < static_cast<int>(execution_path_.size())) {
                     process_text = "Process completed at this step: P" + std::to_string(execution_path_[current_step_] + 1);
                 }
                 else {
