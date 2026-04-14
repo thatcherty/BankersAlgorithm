@@ -295,7 +295,8 @@ private:
     }
 
     std::string BuildExecutionOrderText() const {
-        if (execution_path_.empty()) {
+        const int pcount = sim_state_.get_pcount();
+        if (execution_path_.size() < pcount) {
             return "No safe execution order was produced.";
         }
 
@@ -775,6 +776,7 @@ private:
 
     void BuildResultScreen() {
         using namespace ftxui;
+        
 
         auto prev_button = Button("Previous Step", [this] {
             if (current_step_ > 0) {
@@ -807,6 +809,7 @@ private:
             container,
             [this, prev_button, next_button, back_button] {
                 using namespace ftxui;
+                const int pcount = sim_state_.get_pcount();
 
                 if (snapshots_.empty()) {
                     return vbox({
@@ -825,7 +828,7 @@ private:
                     std::to_string(static_cast<int>(snapshots_.size()) - 1);
 
                 std::string process_text;
-                if (static_cast<int>(execution_path_.size()) == 0)
+                if (static_cast<int>(execution_path_.size()) < pcount)
                 {
                     process_text = "Deadlock, no processes can complete.";
                 }
