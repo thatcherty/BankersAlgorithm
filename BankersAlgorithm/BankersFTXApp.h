@@ -830,7 +830,7 @@ private:
                 std::string process_text;
                 if (static_cast<int>(execution_path_.size()) < pcount)
                 {
-                    process_text = "Deadlock, no processes can complete.";
+                    process_text = "Deadlock gauranteed.";
                 }
                 else if (current_step_ < static_cast<int>(execution_path_.size())) {
                     process_text = "Process completed at this step: P" + std::to_string(execution_path_[current_step_] + 1);
